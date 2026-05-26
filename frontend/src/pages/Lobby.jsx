@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AVATARS } from "../const/Avatar"
 import "../pages/Lobby.css"
-export default function Lobby() {
+export default function Lobby({ handleJoin }) {
     const [name, setName] = useState("");
     const [roomId, setRoomId] = useState("");
     const [avatar, setAvatar] = useState("🎨");
@@ -9,12 +9,27 @@ export default function Lobby() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    function createRoom(){
-        return;
+    async function createRoom() {
+        if (!name.trim()) { setError("Enter your name!"); return; }
+        setLoading(true);
+        setError("");
+        try {
+            const res = await axios.post("/api/rooms", {}, { timeout: 5000 });
+            handleJoin({ roomId: res.data.roomId, playerName: name.trim(), avatar });
+            console.log("Created")
+        } catch (err) {
+            const msg = err?.response?.data?.message || err?.message || "Failed to create room";
+            setError(msg);
+        } finally {
+            setLoading(false);
+        }
     }
 
-    function joinRoom(){
-        return;
+    function joinRoom() {
+        if (!name.trim()) { setError("Enter your name!"); return; }
+        if (!roomId.trim()) { setError("Enter a room code!"); return; }
+        onJoin({ roomId: roomId.trim().toUpperCase(), playerName: name.trim(), avatar });
+
     }
 
     return (
