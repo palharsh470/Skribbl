@@ -1,5 +1,8 @@
 import Lobby from "./pages/Lobby";
 import "../src/App.css"
+import { useState } from "react";
+import { useEffect } from "react";
+import { useRef } from "react";
 
 export default function App() {
 

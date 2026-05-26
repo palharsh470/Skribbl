@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AVATARS } from "../const/Avatar"
+import axios from "axios";
 import "../pages/Lobby.css"
 export default function Lobby({ handleJoin }) {
     const [name, setName] = useState("");
@@ -14,7 +15,8 @@ export default function Lobby({ handleJoin }) {
         setLoading(true);
         setError("");
         try {
-            const res = await axios.post("/api/rooms", {}, { timeout: 5000 });
+            const res = await axios.post("http://localhost:5000/api/rooms", {}, { timeout: 5000 });
+            alert(res.data.roomId)
             handleJoin({ roomId: res.data.roomId, playerName: name.trim(), avatar });
             console.log("Created")
         } catch (err) {
