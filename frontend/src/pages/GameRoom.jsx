@@ -4,7 +4,7 @@ import Timer from "../components/Timer";
 import "../pages/GameRoom.css"
 import Scoreboard from "../components/Scoreboard";
 import Canvas from "../components/Canvas";
-import ChatBox from "../components/ChatBox";
+import ChatBox from "../components/ChatBox.jsx";
 
 export default function GameRoom({ socket, roomId, player, initialRoom, onLeave }) {
 

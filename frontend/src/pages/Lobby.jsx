@@ -15,7 +15,9 @@ export default function Lobby({ onJoin }) {
         setLoading(true);
         setError("");
         try {
-            const res = await axios.post("https://skribbl-2iof.onrender.com/api/rooms", {}, { timeout: 5000 });
+            const API_URL = import.meta.env.VITE_BACKEND_URL;
+            console.log(API_URL)
+            const res = await axios.post(`${API_URL}/api/rooms`, {}, { timeout: 5000 });
             
             onJoin({ roomId: res.data.roomId, playerName: name.trim(), avatar });
             console.log("Created")
