@@ -1,5 +1,5 @@
-const rooms = {};
-const roomTimers = {};
+export const rooms = {};
+export const roomTimers = {};
 const WORDS = [
   "apple", "banana", "cat", "dog", "elephant", "flower", "guitar", "house",
   "island", "jungle", "kite", "lemon", "mountain", "notebook", "ocean",
@@ -249,7 +249,7 @@ export function handleSocketConnection(io) {
     socket.on("vote-drawing", ({ roomId, vote }) => {
       const room = rooms[roomId];
       if (!room) return;
-      if (room.status !== "playing") return; 
+      if (room.status !== "playing") return;
       if (room.currentDrawer === socket.id) return;
 
       if (!room.votes) room.votes = {};
@@ -260,6 +260,141 @@ export function handleSocketConnection(io) {
       io.to(roomId).emit("room-update", room);
     });
 
+    socket.on("draw", ({ roomId, data }) => {
+      const room = rooms[roomId];
+      if (!room) return;
+      if (room.currentDrawer !== socket.id) return;
+
+      room.drawingData.push(data);
+      socket.to(roomId).emit("draw", data);
+    });
+
+    socket.on("clear-canvas", ({ roomId }) => {
+      const room = rooms[roomId];
+      if (!room) return;
+      if (room.currentDrawer !== socket.id) return;
+
+      room.drawingData = [];
+      io.to(roomId).emit("clear-canvas");
+    });
+
+    socket.on("chat-message", ({ roomId, message }) => {
+      const room = rooms[roomId];
+      if (!room) return;
+
+      const player = room.players.find((p) => p.id === socket.id);
+      if (!player) return;
+
+      if (
+        room.currentWord &&
+        room.status === "playing" &&
+        socket.id !== room.currentDrawer &&
+        !player.guessedCorrectly &&
+        message.toLowerCase().trim() === room.currentWord.toLowerCase()
+      ) {
+        player.guessedCorrectly = true;
+        const timeBonus = Math.floor((room.timeLeft / 60) * 500);
+        player.score += 50 + timeBonus;
+
+        const drawer = room.players.find((p) => p.id === room.currentDrawer);
+        if (drawer) {
+          drawer.score += 25;
+          if (room.drawerStartScore !== undefined) {
+            room.drawerStartScore += 25;
+          }
+        }
+
+        io.to(roomId).emit("correct-guess", {
+          playerId: socket.id,
+          playerName: player.name,
+          room,
+        });
+
+        io.to(roomId).emit("chat-message", {
+          id: uuidv4(),
+          type: "system",
+          text: `🎉 ${player.name} guessed the word!`,
+          timestamp: Date.now(),
+        });
+
+
+        const nonDrawers = room.players.filter((p) => p.id !== room.currentDrawer);
+        if (nonDrawers.every((p) => p.guessedCorrectly)) {
+          endTurn(roomId);
+        }
+      } else {
+        io.to(roomId).emit("chat-message", {
+          id: uuidv4(),
+          type: "normal",
+          sender: player.name,
+          senderId: socket.id,
+          text: message,
+          timestamp: Date.now(),
+        });
+      }
+    });
+
+    socket.on("disconnect", () => {
+      const roomId = socket.roomId;
+      if (!roomId || !rooms[roomId]) return;
+
+      const room = rooms[roomId];
+      const wasDrawing = room.currentDrawer === socket.id;
+
+      room.players = room.players.filter((p) => p.id !== socket.id);
+
+      if (room.votes && room.votes[socket.id]) {
+        delete room.votes[socket.id];
+        recalculateDrawerScore(room);
+      }
+
+      io.to(roomId).emit("player-left", {
+        playerId: socket.id,
+        playerName: socket.playerName,
+        room,
+      });
+
+      io.to(roomId).emit("chat-message", {
+        id: uuidv4(),
+        type: "system",
+        text: `👋 ${socket.playerName} left the game`,
+        timestamp: Date.now(),
+      });
+
+      if (room.players.length === 0) {
+        if (roomTimers[roomId]) {
+          clearInterval(roomTimers[roomId]);
+          delete roomTimers[roomId];
+        }
+        delete rooms[roomId];
+      } else if (room.players.length === 1 && (room.status === "playing" || room.status === "selecting")) {
+        if (roomTimers[roomId]) {
+          clearInterval(roomTimers[roomId]);
+          delete roomTimers[roomId];
+        }
+        room.status = "finished";
+        const winner = room.players[0];
+
+        try {
+          const game = new Game({
+            roomId,
+            players: room.players,
+            rounds: room.rounds,
+            currentRound: room.currentRound,
+            status: "finished",
+          });
+          game.save().catch(() => { });
+        } catch { }
+
+        io.to(roomId).emit("game-over", { room, winner });
+      } else if (wasDrawing && (room.status === "playing" || room.status === "selecting")) {
+        endTurn(roomId);
+      } else {
+        io.to(roomId).emit("room-update", room);
+      }
+
+
+    });
 
   });
 }
