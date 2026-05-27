@@ -1,0 +1,93 @@
+.canvas-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 12px;
+}
+.canvas-wrapper canvas {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 0 0 3px var(--border), var(--shadow);
+  object-fit: contain;
+  display: block;
+  background: white;
+}
+.canvas-overlay {
+  position: absolute;
+  inset: 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.03);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+}
+.canvas-overlay span {
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.toolbar {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.color-btn {
+  width: 26px; height: 26px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s;
+  outline: none;
+}
+.color-btn:hover { transform: scale(1.2); }
+.color-btn.active { outline: 3px solid var(--accent2); outline-offset: 2px; transform: scale(1.2); }
+.tools { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.brush-sizes { display: flex; gap: 6px; align-items: center; }
+.size-btn {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.size-btn:hover, .size-btn.active { border-color: var(--accent); background: rgba(124,58,237,0.15); }
+.eraser-btn, .clear-btn {
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.eraser-btn:hover, .eraser-btn.active { border-color: var(--accent3); background: rgba(245,158,11,0.1); }
+.clear-btn:hover { border-color: var(--red); background: rgba(239,68,68,0.1); }
