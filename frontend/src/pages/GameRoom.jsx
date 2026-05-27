@@ -18,6 +18,7 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
     const [wordChoices, setWordChoices] = useState([]);
     const [wordLength, setWordLength] = useState(0);
     const [drawerInfo, setDrawerInfo] = useState(null);
+    const [turnResult, setTurnResult] = useState(null);
 
     function startGame() {
         return;
@@ -82,7 +83,13 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
                 </div>
             )}
 
-
+            {phase === "turn-end" && turnResult && (
+                <div className="turn-banner">
+                    <span>The word was </span>
+                    <strong>{turnResult.toUpperCase()}</strong>
+                    <span> · Next turn starting soon…</span>
+                </div>
+            )}
 
             <div className="center-panel">
                 {phase === "waiting" ? (
@@ -147,6 +154,6 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
             </div>
         </div>
 
-     
+
     )
 }

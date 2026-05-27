@@ -1,0 +1,26 @@
+.scoreboard { padding: 12px; }
+.score-header {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1rem;
+  color: var(--accent3);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+.score-row.drawing { background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.25); }
+.score-row.guessed { background: rgba(34,197,94,0.08); }
+.rank { font-size: 0.9rem; min-width: 24px; }
+.avatar { font-size: 1.1rem; }
+.pname { font-weight: 700; font-size: 0.85rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badges { display: flex; gap: 2px; }
+.badge { font-size: 0.75rem; }
+.pscore { font-family: 'Fredoka One', cursive; color: var(--accent3); font-size: 1rem; min-width: 36px; text-align: right; }
