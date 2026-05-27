@@ -1,0 +1,24 @@
+.word-display { display: flex; align-items: center; gap: 10px; }
+.word-label { color: var(--muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.your-word .the-word {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  color: var(--accent3);
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(245,158,11,0.4);
+}
+.hint-letters { display: flex; gap: 6px; align-items: flex-end; }
+.hint-char {
+  width: 22px; height: 30px;
+  border-bottom: 2.5px solid var(--muted);
+  display: flex; align-items: flex-end; justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: var(--text);
+  transition: all 0.3s;
+}
+.hint-char.revealed {
+  border-color: var(--accent2);
+  color: var(--accent2);
+}
