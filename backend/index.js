@@ -12,23 +12,22 @@ dotenv.config();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-    "http://localhost:5173",
-    "http://localhost:3001",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-    "https://skribbl-4kga-m9p16aenj-harshs-projects-5c916aad.vercel.app"
-
-
+  "http://localhost:5173",
+  "https://skribbl-4kga-m9p16aenj-harshs-projects-5c916aad.vercel.app",
 ];
 
-const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"],
-    },
-});
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 
-app.use(cors({ origin: allowedOrigins }));
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 app.use(express.json());
 
 
