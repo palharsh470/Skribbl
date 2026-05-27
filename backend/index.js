@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import http from "http"
 import cors from "cors";
 import { Server } from "socket.io";
+import router from "./routes/gameRoutes.js";
+import { handleSocketConnection } from "./controllers/socketController.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -25,9 +27,9 @@ app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 
-app.post("/api/rooms", (req, res)=>{
-    res.json({roomId : "123456"})
-});
+app.use("/api", router)
+
+handleSocketConnection(io)
 
 const PORT = 5000
 mongoose.connect("mongodb+srv://palharsh470_db_user:M2phT7ivkPxluuQY@cluster0.w8asagm.mongodb.net/Scribble")

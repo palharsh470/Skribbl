@@ -1,4 +1,5 @@
 import Lobby from "./pages/Lobby";
+import { io } from "socket.io-client";
 import "../src/App.css"
 import { useState } from "react";
 import { useEffect } from "react";
