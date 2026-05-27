@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useRef } from "react";
 
 export default function App() {
-
+     const [view, setView] = useState("lobby");
     const [gameInfo, setGameInfo] = useState(null);
     const socketRef = useRef(null);
     const [socket, setSocket] = useState(null);
@@ -52,6 +52,11 @@ export default function App() {
 
 
     return (
-        <Lobby handleJoin={handleJoin} />
+        <div className="app">
+      {view === "lobby" && <Lobby onJoin={handleJoin} />}
+      {view === "game"  && (
+        <GameRoom/>
+      )}
+    </div>
     )
 }
