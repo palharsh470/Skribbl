@@ -16,6 +16,9 @@ const allowedOrigins = [
     "http://localhost:3001",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
+    "skribbl-4kga-m9p16aenj-harshs-projects-5c916aad.vercel.app"
+
+
 ];
 
 const io = new Server(server, {
