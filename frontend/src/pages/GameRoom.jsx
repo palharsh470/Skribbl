@@ -21,6 +21,7 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
     const [wordChoices, setWordChoices] = useState([]);
     const [wordLength, setWordLength] = useState(0);
     const [messages, setMessages] = useState([]);
+    const [isGuessed, setIsGuessed] = useState(false)
     const [turnResult, setTurnResult] = useState(null);
 
 
@@ -65,6 +66,7 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
             }
             setWordHint(hint);
             setWordLength(wl);
+            setIsGuessed(false)
             setTimeLeft(60);
             setTurnResult(null);
             setRoundInfo({ round, totalRounds });
@@ -88,6 +90,7 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
         socket.on("correct-guess", ({ playerId, playerName, room: r }) => {
             setRoom(r);
             if (playerId === player.id) {
+                setIsGuessed(true)
                 showNotification("🎉 You guessed it! +Points!", 3000);
             }
         });
@@ -103,6 +106,7 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
         socket.on("game-over", ({ room: r, winner }) => {
             setRoom(r);
             setPhase("game-over");
+            
             setGameOver({ winner });
         });
 
@@ -299,6 +303,7 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
                         playerId={player.id}
                         messages={messages}
                         isDrawing={isDrawing}
+                        isGuessed={isGuessed}
                     />
                 </div>
             </div>

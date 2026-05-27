@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import "../components/Chatbox.css"
-export default function ChatBox({ socket, roomId, playerId, messages, isDrawing }) {
+export default function ChatBox({ socket, roomId, playerId, messages, isDrawing, isGuessed }) {
   const [input, setInput] = useState("");
+
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -10,6 +11,7 @@ export default function ChatBox({ socket, roomId, playerId, messages, isDrawing 
   }, [messages]);
 
   const send = (e) => {
+
     e.preventDefault();
     if (!input.trim()) return;
     socket?.emit("chat-message", { roomId, message: input.trim() });
@@ -44,11 +46,11 @@ export default function ChatBox({ socket, roomId, playerId, messages, isDrawing 
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={isDrawing ? "You're drawing!" : "Type your guess..."}
-          disabled={isDrawing}
+          disabled={isDrawing || isGuessed}
           maxLength={50}
           autoComplete="off"
         />
-        <button type="submit" disabled={isDrawing || !input.trim()}>
+        <button type="submit" disabled={isDrawing || isGuessed || !input.trim()}>
           Send
         </button>
       </form>

@@ -201,6 +201,10 @@ export function handleSocketConnection(io) {
       }
 
       const room = rooms[roomId];
+      if(room.players.length >= 10){
+         socket.emit("error", { message: "Maximum limit reached" });
+        return;
+      }
       const player = {
         id: socket.id,
         name: playerName,
@@ -215,7 +219,6 @@ export function handleSocketConnection(io) {
       socket.roomId = roomId;
       socket.playerName = playerName;
 
-      // Send current drawing to new player
       if (room.drawingData.length > 0) {
         socket.emit("drawing-history", room.drawingData);
       }
@@ -296,14 +299,14 @@ export function handleSocketConnection(io) {
         message.toLowerCase().trim() === room.currentWord.toLowerCase()
       ) {
         player.guessedCorrectly = true;
-        const timeBonus = Math.floor((room.timeLeft / 60) * 500);
-        player.score += 50 + timeBonus;
+        const timeBonus = Math.floor(room.timeLeft / 10) * 50;
+        player.score += ( timeBonus || 50 );
 
         const drawer = room.players.find((p) => p.id === room.currentDrawer);
         if (drawer) {
-          drawer.score += 25;
+          drawer.score += 100;
           if (room.drawerStartScore !== undefined) {
-            room.drawerStartScore += 25;
+            room.drawerStartScore += 100;
           }
         }
 

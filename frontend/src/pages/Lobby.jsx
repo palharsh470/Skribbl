@@ -95,7 +95,7 @@ export default function Lobby({ onJoin }) {
                 </button>
 
                 <div className="lobby-footer">
-                    <p>2–8 players · 5 rounds per game · 80s per turn</p>
+                    <p>2–10 players · 5 rounds per game · 60s per turn</p>
                 </div>
             </div>
         </div>
