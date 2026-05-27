@@ -14,6 +14,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   "http://localhost:5173",
   "https://skribbl-4kga-m9p16aenj-harshs-projects-5c916aad.vercel.app",
+  "https://skribbl-4kga.vercel.app"
 ];
 
 app.use(cors({
