@@ -61,9 +61,13 @@ export default function App() {
     return (
         <div className="app">
             {view === "lobby" && <Lobby onJoin={handleJoin} />}
-            {view === "game" && (
+            {view === "game" && gameInfo && (
                 <GameRoom
-                   onLeave={handleLeave}
+                    socket={socket}
+                    roomId={gameInfo.roomId}
+                    player={gameInfo.player}
+                    initialRoom={gameInfo.room}
+                    onLeave={handleLeave}
                 />
             )}
         </div>
