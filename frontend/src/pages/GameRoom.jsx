@@ -20,13 +20,39 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
     const [roundInfo, setRoundInfo] = useState(null);
     const [wordChoices, setWordChoices] = useState([]);
     const [wordLength, setWordLength] = useState(0);
- const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState([]);
     const [turnResult, setTurnResult] = useState(null);
 
 
-    function startGame() {
-        return;
-    }
+    useEffect(() => {
+        if (!socket) return
+
+        socket.on("room-update", (r) => setRoom(r));
+        socket.on("player-joined", ({ player: p, room: r }) => {
+            setRoom(r);
+            addMsg({ id: Date.now(), type: "system", text: `👋 ${p.name} joined!`, timestamp: Date.now() });
+        });
+        socket.on("player-left", ({ playerName, room: r }) => {
+            setRoom(r);
+            addMsg({ id: Date.now(), type: "system", text: `👋 ${playerName} left`, timestamp: Date.now() });
+        });
+
+        
+    }, [player, socket])
+
+    const startGame = () => {
+        socket?.emit("start-game", { roomId });
+    };
+
+    const addMsg = useCallback((msg) => {
+        setMessages((prev) => [...prev.slice(-100), msg]);
+    }, []);
+
+
+    const showNotification = useCallback((text, duration = 3000) => {
+        setNotification(text);
+        setTimeout(() => setNotification(null), duration);
+    }, []);
 
     if (!room) {
         return (
