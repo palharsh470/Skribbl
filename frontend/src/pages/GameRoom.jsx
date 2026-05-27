@@ -36,8 +36,97 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
             setRoom(r);
             addMsg({ id: Date.now(), type: "system", text: `👋 ${playerName} left`, timestamp: Date.now() });
         });
+        socket.on("turn-selecting", ({ drawer, round, totalRounds, room: r }) => {
+            setRoom(r);
+            setPhase("selecting");
+            setDrawerInfo(drawer);
+            setIsDrawing(drawer.id === player.id);
+            setCurrentWord(null);
+            setWordHint(null);
+            setWordLength(0);
+            setTimeLeft(15);
+            setTurnResult(null);
+            setRoundInfo({ round, totalRounds });
+            showNotification(`Round ${round}/${totalRounds} — ${drawer.id === player.id ? "Choose a word to draw!" : `${drawer.name} is choosing a word...`}`);
+        });
 
-        
+        socket.on("word-choices", ({ choices }) => {
+            setWordChoices(choices);
+        });
+
+        socket.on("turn-start", ({ drawer, round, totalRounds, hint, wordLength: wl, room: r }) => {
+            setRoom(r);
+            setPhase("drawing");
+            setDrawerInfo(drawer);
+            const drawing = drawer.id === player.id;
+            setIsDrawing(drawing);
+            if (!drawing) {
+                setCurrentWord(null);
+            }
+            setWordHint(hint);
+            setWordLength(wl);
+            setTimeLeft(60);
+            setTurnResult(null);
+            setRoundInfo({ round, totalRounds });
+            setWordChoices([]);
+            showNotification(`Round ${round}/${totalRounds} — ${drawer.id === player.id ? "Your turn to draw!" : `${drawer.name} is drawing!`}`);
+        });
+
+        socket.on("your-word", ({ word }) => {
+            setCurrentWord(word);
+        });
+
+        socket.on("word-hint", ({ hint, wordLength: wl }) => {
+            setWordHint(hint);
+            setWordLength(wl);
+        });
+
+        socket.on("timer", ({ timeLeft: t }) => {
+            setTimeLeft(t);
+        });
+
+        socket.on("correct-guess", ({ playerId, playerName, room: r }) => {
+            setRoom(r);
+            if (playerId === player.id) {
+                showNotification("🎉 You guessed it! +Points!", 3000);
+            }
+        });
+
+        socket.on("turn-end", ({ word, room: r }) => {
+            setRoom(r);
+            setPhase("turn-end");
+            setTurnResult(word);
+            setIsDrawing(false);
+            showNotification(`The word was: ${word.toUpperCase()}`, 4000);
+        });
+
+        socket.on("game-over", ({ room: r, winner }) => {
+            setRoom(r);
+            setPhase("game-over");
+            setGameOver({ winner });
+        });
+
+        socket.on("chat-message", addMsg);
+        socket.on("error", ({ message }) => showNotification("⚠️ " + message));
+
+        return () => {
+            socket.off("room-update");
+            socket.off("player-joined");
+            socket.off("player-left");
+            socket.off("turn-selecting");
+            socket.off("word-choices");
+            socket.off("turn-start");
+            socket.off("your-word");
+            socket.off("word-hint");
+            socket.off("timer");
+            socket.off("correct-guess");
+            socket.off("close-guess");
+            socket.off("turn-end");
+            socket.off("game-over");
+            socket.off("chat-message");
+            socket.off("error");
+        }
+
     }, [player, socket])
 
     const startGame = () => {
