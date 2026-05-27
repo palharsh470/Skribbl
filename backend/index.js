@@ -1,12 +1,14 @@
 import express from "express";
 import mongoose from "mongoose";
 import http from "http"
+import dotenv from "dotenv";
 import cors from "cors";
 import { Server } from "socket.io";
 import router from "./routes/gameRoutes.js";
 import { handleSocketConnection } from "./controllers/socketController.js";
 
 const app = express();
+dotenv.config();
 const server = http.createServer(app);
 
 const allowedOrigins = [
@@ -27,15 +29,21 @@ app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 
-app.use("/api", router)
-
-handleSocketConnection(io)
-
-const PORT = 5000
-mongoose.connect("mongodb+srv://palharsh470_db_user:M2phT7ivkPxluuQY@cluster0.w8asagm.mongodb.net/Scribble")
-    .then(() => {
-        server.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-        })
+mongoose
+    .connect(process.env.MONGO_URI , {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
     })
-    .catch((err) => console.log("⚠️  MongoDB not connected (running without DB):", err.message));
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.log("MongoDB not connected (running without DB):", err.message));
+
+
+app.use("/api", router);
+
+handleSocketConnection(io);
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+    console.log(` Server running on port ${PORT}`);
+});
+
