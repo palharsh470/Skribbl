@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AVATARS } from "../const/Avatar"
 import axios from "axios";
 import "../pages/Lobby.css"
-export default function Lobby({ handleJoin }) {
+export default function Lobby({ onJoin }) {
     const [name, setName] = useState("");
     const [roomId, setRoomId] = useState("");
     const [avatar, setAvatar] = useState("🎨");
@@ -16,8 +16,8 @@ export default function Lobby({ handleJoin }) {
         setError("");
         try {
             const res = await axios.post("http://localhost:5000/api/rooms", {}, { timeout: 5000 });
-            alert(res.data.roomId)
-            handleJoin({ roomId: res.data.roomId, playerName: name.trim(), avatar });
+            
+            onJoin({ roomId: res.data.roomId, playerName: name.trim(), avatar });
             console.log("Created")
         } catch (err) {
             const msg = err?.response?.data?.message || err?.message || "Failed to create room";

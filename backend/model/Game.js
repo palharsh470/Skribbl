@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 
 const GameSchema = new mongoose.Schema({
   roomId: { type: String, unique: true },

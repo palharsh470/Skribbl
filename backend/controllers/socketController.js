@@ -1,3 +1,5 @@
+import Game from "../model/Game.js";
+import { v4 as uuidv4 } from "uuid";
 export const rooms = {};
 export const roomTimers = {};
 const WORDS = [
@@ -11,7 +13,7 @@ const WORDS = [
   "fireworks", "galaxy", "hurricane", "iceberg", "lantern", "meteor", "noodle",
   "pumpkin", "rocket", "submarine", "trophy", "umbrella", "vampire", "walrus",
 ];
-
+let ioInstance;
 
 function endTurn(roomId) {
 
@@ -62,6 +64,7 @@ function endTurn(roomId) {
 
 function selectWord(roomId, word) {
 
+const room = rooms[roomId];
   if (!room) return;
 
 

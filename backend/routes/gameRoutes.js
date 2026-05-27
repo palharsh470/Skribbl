@@ -1,9 +1,10 @@
 import express from "express"
+import {createRoom, getRoom, getLeaderboard} from "../controllers/gameController.js"
 const router = express.Router();
-const gameController = require("../controllers/gameController");
 
-router.post("/rooms", gameController.createRoom);
-router.get("/rooms/:roomId", gameController.getRoom);
-router.get("/leaderboard", gameController.getLeaderboard);
+
+router.post("/rooms", createRoom);
+router.get("/rooms/:roomId", getRoom);
+router.get("/leaderboard", getLeaderboard);
 
 export default router;

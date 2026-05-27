@@ -9,7 +9,7 @@ const COLORS = [
 
 const BRUSH_SIZES = [2, 5, 10, 20, 35];
 
-export default function DrawingCanvas({ socket, roomId, isDrawing, myVote, phase }) {
+export default function Canvas({ socket, roomId, isDrawing, myVote, phase }) {
   const canvasRef = useRef(null);
   const isDrawingRef = useRef(false);
   const lastPosRef = useRef(null);

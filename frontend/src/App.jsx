@@ -7,7 +7,7 @@ import { useRef } from "react";
 import GameRoom from "./pages/GameRoom.jsx";
 
 export default function App() {
-    const [view, setView] = useState("game");
+    const [view, setView] = useState("lobby");
     const [gameInfo, setGameInfo] = useState(null);
     const socketRef = useRef(null);
     const [socket, setSocket] = useState(null);
@@ -15,7 +15,7 @@ export default function App() {
 
     const handleJoin = ({ roomId, playerName, avatar }) => {
         socketRef.current?.disconnect();
-        const s = io(window.location.origin, { transports: ["websocket"] });
+        const s = io("http://localhost:5000", { transports: ["websocket"] });
         socketRef.current = s;
         setSocket(s);
 

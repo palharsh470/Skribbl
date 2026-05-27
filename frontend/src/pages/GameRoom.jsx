@@ -1,7 +1,10 @@
-import { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import WordDisplay from "../components/WordDisplay";
 import Timer from "../components/Timer";
 import "../pages/GameRoom.css"
+import Scoreboard from "../components/Scoreboard";
+import Canvas from "../components/Canvas";
+import ChatBox from "../components/ChatBox";
 
 export default function GameRoom({ socket, roomId, player, initialRoom, onLeave }) {
 
@@ -17,11 +20,21 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
     const [roundInfo, setRoundInfo] = useState(null);
     const [wordChoices, setWordChoices] = useState([]);
     const [wordLength, setWordLength] = useState(0);
-    const [drawerInfo, setDrawerInfo] = useState(null);
+ const [messages, setMessages] = useState([]);
     const [turnResult, setTurnResult] = useState(null);
+
 
     function startGame() {
         return;
+    }
+
+    if (!room) {
+        return (
+            <div className="loading-screen">
+                <div className="spinner" />
+                <p>Connecting to room…</p>
+            </div>
+        );
     }
 
     return (
@@ -91,69 +104,90 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
                 </div>
             )}
 
-            <div className="center-panel">
-                {phase === "waiting" ? (
-                    <div className="waiting-room">
-                        <div className="waiting-icon">🎮</div>
-                        <h2>Waiting for players…</h2>
-                        <p className="room-code-display">
-                            Room Code: <strong>{roomId}</strong>
-                        </p>
-                        <p className="player-count">{room.players.length} player{room.players.length !== 1 ? "s" : ""} in room</p>
-                        <div className="player-list">
-                            {room.players.map((p) => (
-                                <div key={p.id} className="player-chip">
-                                    <span>{p.avatar}</span>
-                                    <span>{p.name}</span>
-                                    {p.id === player.id && <span className="you-badge">You</span>}
-                                </div>
-                            ))}
+            <div className="game-body">
+                <div className="left-panel">
+                    <Scoreboard players={room.players} currentDrawerId={drawerInfo?.id} votes={room.votes} />
+                </div>
+
+                <div className="center-panel">
+                    {phase === "waiting" ? (
+                        <div className="waiting-room">
+                            <div className="waiting-icon">🎮</div>
+                            <h2>Waiting for players…</h2>
+                            <p className="room-code-display">
+                                Room Code: <strong>{roomId}</strong>
+                            </p>
+                            <p className="player-count">{room.players.length} player{room.players.length !== 1 ? "s" : ""} in room</p>
+                            <div className="player-list">
+                                {room.players.map((p) => (
+                                    <div key={p.id} className="player-chip">
+                                        <span>{p.avatar}</span>
+                                        <span>{p.name}</span>
+                                        {p.id === player.id && <span className="you-badge">You</span>}
+                                    </div>
+                                ))}
+                            </div>
+                            {room.players[0]?.id === player.id && (
+                                <button
+                                    className="start-btn"
+                                    onClick={startGame}
+                                    disabled={room.players.length < 2}
+                                >
+                                    {room.players.length < 2 ? "Need 2+ players" : "🚀 Start Game"}
+                                </button>
+                            )}
+                            {room.players[0]?.id !== player.id && (
+                                <p className="host-notice">Waiting for {room.players[0]?.name} to start…</p>
+                            )}
                         </div>
-                        {room.players[0]?.id === player.id && (
-                            <button
-                                className="start-btn"
-                                onClick={startGame}
-                                disabled={room.players.length < 2}
-                            >
-                                {room.players.length < 2 ? "Need 2+ players" : "🚀 Start Game"}
-                            </button>
-                        )}
-                        {room.players[0]?.id !== player.id && (
-                            <p className="host-notice">Waiting for {room.players[0]?.name} to start…</p>
-                        )}
-                    </div>
-                ) : phase === "selecting" ? (
-                    <div className="selecting-room">
-                        {isDrawing ? (
-                            <div className="word-select-card">
-                                <h2>Choose a Word to Draw</h2>
-                                <div className="word-choices">
-                                    {wordChoices.map((word) => (
-                                        <button
-                                            key={word}
-                                            className="word-choice-btn"
-                                            onClick={() => socket?.emit("select-word", { roomId, word })}
-                                        >
-                                            {word.toUpperCase()}
-                                        </button>
-                                    ))}
+                    ) : phase === "selecting" ? (
+                        <div className="selecting-room">
+                            {isDrawing ? (
+                                <div className="word-select-card">
+                                    <h2>Choose a Word to Draw</h2>
+                                    <div className="word-choices">
+                                        {wordChoices.map((word) => (
+                                            <button
+                                                key={word}
+                                                className="word-choice-btn"
+                                                onClick={() => socket?.emit("select-word", { roomId, word })}
+                                            >
+                                                {word.toUpperCase()}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p className="selection-timer">Time remaining: <strong>{timeLeft}s</strong></p>
                                 </div>
-                                <p className="selection-timer">Time remaining: <strong>{timeLeft}s</strong></p>
-                            </div>
-                        ) : (
-                            <div className="word-wait-card">
-                                <div className="wait-spinner" />
-                                <h2>{drawerInfo?.name || "The artist"} is choosing a word…</h2>
-                                <p className="selection-timer">Time remaining: <strong>{timeLeft}s</strong></p>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div>Canvas</div>
-                )}
+                            ) : (
+                                <div className="word-wait-card">
+                                    <div className="wait-spinner" />
+                                    <h2>{drawerInfo?.name || "The artist"} is choosing a word…</h2>
+                                    <p className="selection-timer">Time remaining: <strong>{timeLeft}s</strong></p>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <Canvas
+                            socket={socket}
+                            roomId={roomId}
+                            isDrawing={isDrawing}
+                            myVote={room?.votes?.[player.id] || null}
+                            phase={phase}
+                        />
+                    )}
+                </div>
+
+                <div className="right-panel">
+                    <ChatBox
+                        socket={socket}
+                        roomId={roomId}
+                        playerId={player.id}
+                        messages={messages}
+                        isDrawing={isDrawing}
+                    />
+                </div>
             </div>
+
         </div>
-
-
     )
 }
