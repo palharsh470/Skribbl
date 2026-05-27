@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import "../components/Chatbox.css"
+import "../components/ChatBox.css"
 export default function ChatBox({ socket, roomId, playerId, messages, isDrawing, isGuessed }) {
   const [input, setInput] = useState("");
 
