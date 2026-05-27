@@ -160,7 +160,7 @@ export default function GameRoom({ socket, roomId, player, initialRoom, onLeave 
         <div className="game-room">
             <div className="game-header">
                 <div className="header-left">
-                    <span className="logo-sm">✏️ Scribble</span>
+                    <span className="logo-sm">✏️ Skribbl</span>
                     <span className="room-badge">#{roomId}</span>
                     {roundInfo && <span className="round-badge">Round {roundInfo.round}/{roundInfo.totalRounds}</span>}
                 </div>

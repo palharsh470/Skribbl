@@ -15,7 +15,7 @@ export default function App() {
 
     const handleJoin = ({ roomId, playerName, avatar }) => {
         socketRef.current?.disconnect();
-        const s = io("http://localhost:5000", { transports: ["websocket"] });
+        const s = io("https://skribbl-2iof.onrender.com", { transports: ["websocket"] });
         socketRef.current = s;
         setSocket(s);
 
